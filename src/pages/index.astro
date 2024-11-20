@@ -1,85 +1,57 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import SectionCollapsible from "@/components/SectionCollapsible";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { EncPanel, DecPanel } from "@/components/brotliPanels";
 import OGBase from "@/components/OGBase.astro";
-import Profile from "@/content/fragments/myl7.md";
-import friends from "@/content/data/friends";
 
-const title = "myl7's Blog";
-const description = "myl7's blog";
-
-const posts = (await getCollection("posts", ({ data: { unlisted } }) => unlisted != true)).sort((a, b) => {
-  const timeDelta = b.data.pubDate.getTime() - a.data.pubDate.getTime();
-  if (timeDelta != 0) return timeDelta;
-  return a.slug < b.slug ? -1 : 1;
-});
+const title = "Brotli online encode/decode tool";
+const ogTitle = `${title} | Utilities on myl7's Blog`;
+const description = "En/decode ((de)compress) data online with Brotli. All done locally to maximize privacy.";
 ---
 
 <BaseLayout {title} {description}>
-  <OGBase slot="head" {title} {description} />
+  <OGBase slot="head" title={ogTitle} {description} />
   <main class="flex flex-col gap-4 px-4">
-    <h1 class="sr-only">myl7's Blog!</h1>
-    <section>
-      <SectionCollapsible title="About me" client:load>
-        <Card>
-          <CardHeader>
-            <CardTitle>I am myl7:</CardTitle>
-          </CardHeader>
-          <CardContent className="post">
-            <Profile />
-          </CardContent>
-        </Card>
-      </SectionCollapsible>
-    </section>
-    <section class="flex flex-col gap-4">
-      <div class="flex flex-col gap-1">
-        <h2 class="text-xl">Posts</h2>
-        <hr />
-      </div>
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {
-          posts.map(({ slug, data: { title, pubDate, description, updDate } }) => (
-            <Card>
-              <CardHeader>
-                <p class="text-xs text-muted-foreground">
-                  Published on {pubDate.toISOString().slice(0, 10)}
-                  {updDate && ` and updated on ${updDate.toISOString().slice(0, 10)}`}
-                </p>
-                <CardTitle className="text-xl font-serif">
-                  <a class="link" href={`/p/${slug}`}>
-                    {title}
-                  </a>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="font-serif">{description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))
-        }
-      </div>
-    </section>
-    <section>
-      <SectionCollapsible title="Friends" client:load>
-        <Card className="pt-6">
-          <CardContent>
-            <ul class="flex list-inside list-disc flex-wrap gap-4">
-              {
-                friends.map((friend) => (
-                  <li>
-                    <a href={friend.url} class="link">
-                      {friend.name}
-                    </a>
-                  </li>
-                ))
-              }
-            </ul>
-          </CardContent>
-          <CardFooter>Feel free to request a friend link if you have met me in reality!</CardFooter>
-        </Card>
-      </SectionCollapsible>
-    </section>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Brotli online encode/decode tool</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <CardDescription>
+          Encode/decode (compress/decompress) data online with Brotli leveraging WASM. All done locally to maximize
+          privacy.
+        </CardDescription>
+        <CardDescription>
+          Text input should be in Python byte string format (e.g., <code class="inline-code"
+            >0\xff\\ = [48, 255, 92]</code
+          >, in which you can omit the surrounded quotes and <code class="inline-code">b</code> prefix). Text output would
+          also be in that format. When both text and file input are given, file input will be used. Click the refresh button
+          aside to abort uploaded files.
+        </CardDescription>
+      </CardContent>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Decode</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <CardDescription>
+          Powered by <a href="https://github.com/myl7/brotli-dec-wasm" class="link">brotli-dec-wasm</a>
+        </CardDescription>
+        <DecPanel client:load />
+      </CardContent>
+    </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-xl">Encode</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <CardDescription>
+          Powered by <a href="https://github.com/httptoolkit/brotli-wasm" class="link">brotli-wasm</a>. This library is
+          dynamically loaded.
+        </CardDescription>
+        <EncPanel client:load />
+      </CardContent>
+    </Card>
   </main>
 </BaseLayout>

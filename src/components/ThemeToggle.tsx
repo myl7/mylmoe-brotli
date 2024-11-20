@@ -2,7 +2,6 @@ import React from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import setGiscusTheme from "@/lib/setGiscusTheme";
 
 export default function ThemeToggle() {
   const [theme, setThemeState] = React.useState<"theme-light" | "dark" | "system">("theme-light");
@@ -16,7 +15,7 @@ export default function ThemeToggle() {
     const isDark =
       theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     document.documentElement.classList[isDark ? "add" : "remove"]("dark");
-    setGiscusTheme(isDark);
+    // setGiscusTheme(isDark);
   }, [theme]);
 
   return (
